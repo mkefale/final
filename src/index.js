@@ -71,6 +71,16 @@ var Header = React.createClass({
   }
 })
 
+var SortBarItem = React.createClass({
+  render: function() {
+    return (
+      <li className={this.props.currentView === this.props.view ? "active" : ""}>
+        <a href="#" onClick={() => this.props.viewChanged(this.props.view)}>{this.props.title}</a>
+      </li>
+    )
+  }
+})
+
 var SortBar = React.createClass({
   viewChanged: function(view) {
     this.props.viewChanged(view)
@@ -80,9 +90,9 @@ var SortBar = React.createClass({
       <div className="sort row">
         <div className="col-sm-12">
           <ul className="nav nav-pills">
-            <li className="active"><a href="#" onClick={() => this.viewChanged('latest')}>Latest Releases</a></li>
-            <li><a href="#" onClick={() => this.viewChanged('alpha')}>A-Z</a></li>
-            <li><a href="#" onClick={() => this.viewChanged('map')}>Where to Watch</a></li>
+            <SortBarItem view="latest" title="Latest" currentView={this.props.currentView} viewChanged={this.props.viewChanged} />
+            <SortBarItem view="alpha" title="A-Z" currentView={this.props.currentView} viewChanged={this.props.viewChanged} />
+            <SortBarItem view="map" title="Where to Watch" currentView={this.props.currentView} viewChanged={this.props.viewChanged} />
             <li className="nav-text pull-right">{this.props.movieCount} movies</li>
           </ul>
         </div>
@@ -172,6 +182,22 @@ var App = React.createClass({
     }
   },
   renderMainSection: function() {
+    if (this.state.currentView === 'latest') {
+      return (
+        <div className="col-sm-12">
+          <MovieList movies={movieData.sort(this.movieCompareByReleased)} movieClicked={this.movieClicked} />
+          {this.renderMovieDetails()}
+        </div>
+      )
+    }
+    if (this.state.currentView === 'alpha') {
+      return (
+        <div className="col-sm-12">
+          <MovieList movies={movieData.sort(this.movieCompareByTitle)} movieClicked={this.movieClicked} />
+          {this.renderMovieDetails()}
+        </div>
+      )
+    }
     if (this.state.currentView === 'map') {
       return (
         <div className="col-sm-12">
@@ -186,22 +212,6 @@ var App = React.createClass({
                      return <Marker key={place.id} lat={place.lat} lng={place.long} />
                      })}
           </Gmaps>
-        </div>
-      )
-    }
-    if (this.state.currentView === 'latest') {
-      return (
-        <div className="col-sm-12">
-          <MovieList movies={movieData.sort(this.movieCompareByReleased)} movieClicked={this.movieClicked} />
-          {this.renderMovieDetails()}
-        </div>
-      )
-    }
-    if (this.state.currentView === 'alpha') {
-      return (
-        <div className="col-sm-12">
-          <MovieList movies={movieData.sort(this.movieCompareByTitle)} movieClicked={this.movieClicked} />
-          {this.renderMovieDetails()}
         </div>
       )
     }
